@@ -1,6 +1,7 @@
 package com.company.thread.interrupt;
 
 import java.math.BigInteger;
+import java.util.concurrent.PriorityBlockingQueue;
 
 public class Main {
 
@@ -14,6 +15,22 @@ public class Main {
         thread1.setDaemon(true);
         thread1.start();
         thread1.interrupt();
+
+        // Testing ActiveObject
+        ActiveObject obj = new ActiveObject();
+        // Call doTask in different threads
+        Thread t1 = new Thread(() -> {
+                obj.doTask("1", 2);
+        });
+        Thread t2 = new Thread(() -> {
+                obj.doTask("2", 0);
+        });
+        Thread t3 = new Thread(() -> {
+                obj.doTask("3", 1);
+        });
+        t1.start();
+        t2.start();
+        t3.start();
     }
 
     private static class BlockingTask implements Runnable {
@@ -53,6 +70,39 @@ public class Main {
                 result = result.multiply(base);
             }
             return result;
+        }
+    }
+
+    public static class ActiveObject {
+        class Task implements Comparable < Task > {
+            // smaller number means higher priority
+            int priority;
+            String name;
+            Task(String name, int priority) {
+                this.name = name;
+                this.priority = priority;
+            }
+            public int compareTo(Task other) {
+                return Integer.compare(this.priority, other.priority);
+            }
+        }
+        private PriorityBlockingQueue < Task > dispatchQueue = new PriorityBlockingQueue< >();
+        public ActiveObject() {
+            // A priority scheduler
+            new Thread(() -> {
+            while (true) {
+                try {
+                    Task task = dispatchQueue.take();
+                    System.out.println("Executing task " + task.name);
+                } catch (InterruptedException e) {
+                    break;
+                }
+            }
+      })
+      .start();
+        }
+        public void doTask(String name, int priority) {
+            dispatchQueue.put(new Task(name, priority));
         }
     }
 }

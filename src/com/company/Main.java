@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Random;
 
 public class Main {
-    public static final int MAX_PASSWORD = 999999;
+    public static final int MAX_PASSWORD = 9999;
     public static void main(String[] args) throws InterruptedException {
         Random random = new Random();
 
@@ -13,8 +13,12 @@ public class Main {
         List<Thread> threads = new ArrayList<>();
         threads.add(new AscendingHackerThread(vault));
         threads.add(new AscendingHackerThreadHalf(vault));
+        threads.add(new AscendingHackerThreadQuart(vault));
+        threads.add(new AscendingHackerThreadThreeQuart(vault));
         threads.add(new DescendingHackerThread(vault));
         threads.add(new DescendingHackerThreadHalf(vault));
+        threads.add(new DescendingHackerThreadQuart(vault));
+        threads.add(new DescendingHackerThreadThreeQuart(vault));
         threads.add(new PoliceThread());
 
         threads.forEach(Thread::start);
@@ -59,7 +63,7 @@ public class Main {
 
         @Override
         public void run() {
-            for(int guess = 0; guess < MAX_PASSWORD/2; guess++) {
+            for(int guess = 0; guess < MAX_PASSWORD/4; guess++) {
                 if(vault.isCorrectPassword(guess)) {
                     System.out.println(this.getName() + " guessed the password " + guess);
                     System.exit(0);
@@ -75,7 +79,39 @@ public class Main {
 
         @Override
         public void run() {
-            for(int guess = MAX_PASSWORD/2; guess < MAX_PASSWORD; guess++) {
+            for(int guess = MAX_PASSWORD/2; guess < MAX_PASSWORD* (3/4); guess++) {
+                if(vault.isCorrectPassword(guess)) {
+                    System.out.println(this.getName() + " guessed the password " + guess);
+                    System.exit(0);
+                }
+            }
+        }
+    }
+
+    private static class AscendingHackerThreadQuart extends HackerThread {
+        public AscendingHackerThreadQuart(Vault vault) {
+            super(vault);
+        }
+
+        @Override
+        public void run() {
+            for(int guess = MAX_PASSWORD/4; guess < MAX_PASSWORD/2; guess++) {
+                if(vault.isCorrectPassword(guess)) {
+                    System.out.println(this.getName() + " guessed the password " + guess);
+                    System.exit(0);
+                }
+            }
+        }
+    }
+
+    private static class AscendingHackerThreadThreeQuart extends HackerThread {
+        public AscendingHackerThreadThreeQuart(Vault vault) {
+            super(vault);
+        }
+
+        @Override
+        public void run() {
+            for(int guess = MAX_PASSWORD * (3/4); guess < MAX_PASSWORD; guess++) {
                 if(vault.isCorrectPassword(guess)) {
                     System.out.println(this.getName() + " guessed the password " + guess);
                     System.exit(0);
@@ -107,7 +143,39 @@ public class Main {
 
         @Override
         public void run() {
-            for(int guess = MAX_PASSWORD/2; guess >= 0; guess--) {
+            for(int guess = MAX_PASSWORD/2; guess > MAX_PASSWORD/4; guess--) {
+                if(vault.isCorrectPassword(guess)) {
+                    System.out.println(this.getName() + " guessed the password " + guess);
+                    System.exit(0);
+                }
+            }
+        }
+    }
+
+    private static class DescendingHackerThreadQuart extends HackerThread {
+        public DescendingHackerThreadQuart(Vault vault) {
+            super(vault);
+        }
+
+        @Override
+        public void run() {
+            for(int guess = MAX_PASSWORD * (3/4); guess > MAX_PASSWORD/2; guess--) {
+                if(vault.isCorrectPassword(guess)) {
+                    System.out.println(this.getName() + " guessed the password " + guess);
+                    System.exit(0);
+                }
+            }
+        }
+    }
+
+    private static class DescendingHackerThreadThreeQuart extends HackerThread {
+        public DescendingHackerThreadThreeQuart(Vault vault) {
+            super(vault);
+        }
+
+        @Override
+        public void run() {
+            for(int guess = MAX_PASSWORD/4; guess > 0; guess--) {
                 if(vault.isCorrectPassword(guess)) {
                     System.out.println(this.getName() + " guessed the password " + guess);
                     System.exit(0);
